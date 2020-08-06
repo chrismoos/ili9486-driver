@@ -5,7 +5,7 @@ use display_interface::DisplayError;
 use display_interface::ReadWriteInterface;
 use display_interface::WriteMode;
 
-use embedded_hal::blocking::delay::DelayUs;
+
 use embedded_hal::digital::v2::{InputPin, OutputPin};
 pub struct GPIO8ParallelInterface<DB0, DB1, DB2, DB3, DB4, DB5, DB6, DB7, CS, DCX, RDX, WRX>
 where

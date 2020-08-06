@@ -31,4 +31,5 @@ pub trait IoPin {
     fn into_output(&mut self) -> &mut Self::Output;
 }
 
+#[cfg(feature = "stm32f1xx")]
 pub mod stm32f1xx;

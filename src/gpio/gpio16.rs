@@ -5,7 +5,6 @@ use display_interface::DisplayError;
 use display_interface::ReadWriteInterface;
 use display_interface::WriteMode;
 
-use embedded_hal::blocking::delay::DelayUs;
 use embedded_hal::digital::v2::{InputPin, OutputPin};
 pub struct GPIO16ParallelInterface<
     DB0,
@@ -297,7 +296,7 @@ where
             PixelFormat::Rgb565 => {
                 buf[0] = (((red & 0b11111) as u16) << 10)
                     | (((green & 0b111111) as u16) << 4)
-                    | (red & 0b11111) as u16;
+                    | (blue & 0b11111) as u16;
                 1
             }
             PixelFormat::Rgb666 => panic!("not implemented"),

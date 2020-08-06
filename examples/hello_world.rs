@@ -2,24 +2,24 @@
 #![no_std]
 #![no_main]
 
-use display_interface::WriteMode;
+
 use embedded_graphics::image::Image;
 use ili9486::gpio::GPIO8ParallelInterface;
 use ili9486::io::stm32f1xx::PullDownInput;
 use ili9486::io::stm32f1xx::PushPullOutput;
 use tinytga::Tga;
 
-use embedded_graphics::primitives::Rectangle;
-use embedded_graphics::style::PrimitiveStyleBuilder;
+
+
 use embedded_graphics::{
     fonts::{Font6x8, Text},
-    pixelcolor::{Rgb888},
+    pixelcolor::{Rgb565, Rgb888},
     prelude::*,
     primitives::Circle,
     style::{PrimitiveStyle, TextStyle},
 };
 
-use cortex_m_semihosting::hprintln;
+
 
 use ili9486::io::stm32f1xx::gpioa::GPIOA;
 use ili9486::io::stm32f1xx::gpiob::GPIOB;
@@ -127,66 +127,25 @@ fn main() -> ! {
             .unwrap();
     let mut lcd_driver = ILI9486::new(&mut delay, PixelFormat::Rgb565, parallel_gpio, pb5).unwrap();
 
-    let mut empty: [u8; 0] = [0; 0];
+    // reset
+    lcd_driver.write_command(0x01, &[]).unwrap();
+    lcd_driver.write_command(0x11, &[]).unwrap();
 
-    lcd_driver.write_command(0x01, &empty).unwrap();
-    lcd_driver.write_command(0x11, &empty).unwrap();
-
-    //lcd_driver.write_command(0x3A, &[0b01010101]).unwrap();
-    lcd_driver.write_command(0x20, &mut empty).unwrap();
+    lcd_driver.write_command(0x20, &[]).unwrap();
 
     // MADCTL settings
-    lcd_driver.write_command(0x36, &mut [0b10001000]).unwrap();
+    lcd_driver.write_command(0x36, &[0b10001000]).unwrap();
 
     lcd_driver.clear_screen().unwrap();
 
-    // Streaming interface
-    lcd_driver
-        .rw_interface()
-        .write(WriteMode::Command, &mut [0x04])
-        .unwrap();
-    let mut num_read = 4;
+    // turn on display
+    lcd_driver.write_command(0x13, &[]).unwrap();
+    lcd_driver.write_command(0x29, &[]).unwrap();
+    lcd_driver.write_command(0x38, &[]).unwrap();
 
-    hprintln!("start the read");
-    for b in lcd_driver.rw_interface() {
-        if num_read == 0 {
-            break;
-        }
-        hprintln!("{:?}", b.unwrap());
-        num_read -= 1;
-    }
-
-    // Fill interface
-    let mut display_info: [u8; 4] = [0; 4];
-    lcd_driver
-        .rw_interface()
-        .write(WriteMode::Command, &mut [0x04])
-        .unwrap();
-    lcd_driver.rw_interface().read(&mut display_info).unwrap();
-    hprintln!("{:?}", display_info);
-
-    // turn on
-    lcd_driver.write_command(0x13, &empty).unwrap();
-    lcd_driver.write_command(0x29, &empty).unwrap();
-    lcd_driver.write_command(0x38, &empty).unwrap();
-
-    Rectangle::new(Point::new(16, 16), Point::new(200, 240))
-        .into_styled(
-            PrimitiveStyleBuilder::new()
-                .stroke_width(32)
-                .stroke_color(Rgb888::RED)
-                .fill_color(Rgb888::CYAN)
-                .build(),
-        )
-        .draw(&mut lcd_driver)
-        .unwrap();
-
-    let c =
-        Circle::new(Point::new(300, 240), 8).into_styled(PrimitiveStyle::with_fill(Rgb888::RED));
-    let t = Text::new("Hello Rust (and ILI9486 display)!", Point::new(48, 400))
+    let t = Text::new("Hello Rust (and ILI9486 display)!", Point::new(64, 175))
         .into_styled(TextStyle::new(Font6x8, Rgb888::GREEN));
 
-    c.draw(&mut lcd_driver).unwrap();
     t.draw(&mut lcd_driver).unwrap();
 
     let tga = Tga::from_slice(include_bytes!("../test/rust-rle-bw-topleft.tga")).unwrap();
@@ -195,7 +154,7 @@ fn main() -> ! {
         &tga,
         Point::new(
             (320 / 2 - (tga.width() / 2)) as i32,
-            ((480 / 2 - (tga.height() / 2)) + 64) as i32,
+            ((350 / 2 - (tga.height() / 2)) + 64) as i32,
         ),
     );
 
