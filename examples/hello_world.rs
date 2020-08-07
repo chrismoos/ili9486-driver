@@ -20,7 +20,7 @@ use ili9486::color::PixelFormat;
 use ili9486::io::stm32f1xx::gpioa::GPIOA;
 use ili9486::io::stm32f1xx::gpiob::GPIOB;
 use ili9486::io::stm32f1xx::gpioc::GPIOC;
-use ili9486::{Commands, ILI9486};
+use ili9486::{Command, Commands, ILI9486};
 
 extern crate panic_semihosting;
 
@@ -124,20 +124,26 @@ fn main() -> ! {
     let mut lcd_driver = ILI9486::new(&mut delay, PixelFormat::Rgb565, parallel_gpio, pb5).unwrap();
 
     // reset
-    lcd_driver.write_command(0x01, &[]).unwrap();
-    lcd_driver.write_command(0x11, &[]).unwrap();
+    lcd_driver.write_command(Command::Nop, &[]).unwrap();
+    lcd_driver.write_command(Command::SleepOut, &[]).unwrap();
 
-    lcd_driver.write_command(0x20, &[]).unwrap();
+    lcd_driver
+        .write_command(Command::DisplayInversionOff, &[])
+        .unwrap();
 
     // MADCTL settings
-    lcd_driver.write_command(0x36, &[0b10001000]).unwrap();
+    lcd_driver
+        .write_command(Command::MemoryAccessControl, &[0b10001000])
+        .unwrap();
 
     lcd_driver.clear_screen().unwrap();
 
     // turn on display
-    lcd_driver.write_command(0x13, &[]).unwrap();
-    lcd_driver.write_command(0x29, &[]).unwrap();
-    lcd_driver.write_command(0x38, &[]).unwrap();
+    lcd_driver
+        .write_command(Command::NormalDisplayMode, &[])
+        .unwrap();
+    lcd_driver.write_command(Command::DisplayOn, &[]).unwrap();
+    lcd_driver.write_command(Command::IdleModeOff, &[]).unwrap();
 
     let t = Text::new("Hello Rust (and ILI9486 display)!", Point::new(64, 175))
         .into_styled(TextStyle::new(Font6x8, Rgb888::GREEN));

@@ -7,6 +7,7 @@ use embedded_graphics::image::Image;
 use ili9486::gpio::GPIO8ParallelInterface;
 use ili9486::io::stm32f1xx::PullDownInput;
 use ili9486::io::stm32f1xx::PushPullOutput;
+use ili9486::Command;
 use tinytga::Tga;
 
 use embedded_graphics::primitives::Rectangle;
@@ -130,21 +131,23 @@ fn main() -> ! {
 
     let mut empty: [u8; 0] = [0; 0];
 
-    lcd_driver.write_command(0x01, &empty).unwrap();
-    lcd_driver.write_command(0x11, &empty).unwrap();
+    lcd_driver.write_command(Command::Nop, &empty).unwrap();
+    lcd_driver.write_command(Command::SleepOut, &empty).unwrap();
 
-    //lcd_driver.write_command(0x3A, &[0b01010101]).unwrap();
-    lcd_driver.write_command(0x20, &mut empty).unwrap();
+    lcd_driver
+        .write_command(Command::DisplayInversionOff, &mut empty)
+        .unwrap();
 
     // MADCTL settings
-    lcd_driver.write_command(0x36, &mut [0b10001000]).unwrap();
+    lcd_driver
+        .write_command(Command::MemoryAccessControl, &mut [0b10001000])
+        .unwrap();
 
     lcd_driver.clear_screen().unwrap();
 
     // Streaming interface
     lcd_driver
-        .writer()
-        .write(WriteMode::Command, &mut [0x04])
+        .write_command(Command::ReadDisplayId, &[])
         .unwrap();
     let mut num_read = 4;
 
@@ -160,16 +163,21 @@ fn main() -> ! {
     // Fill interface
     let mut display_info: [u8; 4] = [0; 4];
     lcd_driver
-        .writer()
-        .write(WriteMode::Command, &mut [0x04])
+        .write_command(Command::ReadDisplayId, &mut [])
         .unwrap();
     lcd_driver.writer().read(&mut display_info).unwrap();
     hprintln!("{:?}", display_info);
 
     // turn on
-    lcd_driver.write_command(0x13, &empty).unwrap();
-    lcd_driver.write_command(0x29, &empty).unwrap();
-    lcd_driver.write_command(0x38, &empty).unwrap();
+    lcd_driver
+        .write_command(Command::NormalDisplayMode, &empty)
+        .unwrap();
+    lcd_driver
+        .write_command(Command::DisplayOn, &empty)
+        .unwrap();
+    lcd_driver
+        .write_command(Command::IdleModeOff, &empty)
+        .unwrap();
 
     Rectangle::new(Point::new(16, 16), Point::new(200, 240))
         .into_styled(

@@ -1,0 +1,102 @@
+use crate::PixelFormat;
+use display_interface::DisplayError;
+
+pub enum Command {
+    Nop = 0x00,
+    SoftReset = 0x01,
+    ReadDisplayId = 0x04,
+    ReadErrors = 0x05,
+    ReadDisplayStatus = 0x09,
+    ReadDisplayPowerMode = 0x0a,
+    ReadDisplayMADCTL = 0x0b,
+    ReadDisplayPixelFormat = 0x0c,
+    ReadDisplayImageMode = 0x0d,
+    ReadDisplaySignalMode = 0x0e,
+    ReadDisplaySelfDiagResult = 0x0f,
+    SleepIn = 0x10,
+    SleepOut = 0x11,
+    PartialModeOn = 0x12,
+    NormalDisplayMode = 0x13,
+    DisplayInversionOff = 0x20,
+    DisplayInversionOn = 0x21,
+    DisplayOff = 0x28,
+    DisplayOn = 0x29,
+    ColumnAddressSet = 0x2a,
+    PageAddressSet = 0x2b,
+    MemoryWrite = 0x2c,
+    MemoryRead = 0x2e,
+    PartialArea = 0x30,
+    VerticalScrollingDefinition = 0x33,
+    TearingEffectLineOff = 0x34,
+    TearingEffectLineOn = 0x35,
+    MemoryAccessControl = 0x36,
+    VerticalScrollingStartAddress = 0x37,
+    IdleModeOff = 0x38,
+    IdleModeOn = 0x39,
+    InterfacePixelFormat = 0x3a,
+    MemoryWriteContinue = 0x3c,
+    MemoryReadContinue = 0x3e,
+    WriteTearScanLine = 0x44,
+    ReadTearScanLine = 0x45,
+    WriteDisplayBrightnessValue = 0x51,
+    ReadDisplayBrigthnessValue = 0x52,
+    WriteCTRLDisplayValue = 0x53,
+    ReadCTRLDisplayValue = 0x54,
+    WriteCABrigthnessControl = 0x55,
+    ReadCABrigthnessControl = 0x56,
+    WriteCABCMinBrigthness = 0x5e,
+    ReadCABCMinBrigthness = 0x5f,
+    ReadFirstChecksum = 0xaa,
+    ReadContinueChecksum = 0xab,
+    ReadID1 = 0xda,
+    ReadID2 = 0xdb,
+    ReadID3 = 0xdc,
+    InterfaceModeControl = 0xb0,
+    FrameRateControlNormal = 0xb1,
+    FrameRateControlIdle = 0xb2,
+    FrameRateControlPartial = 0xb3,
+    DisplayInversionControl = 0xb4,
+    BlankingPorchControl = 0xb5,
+    DisplayFunctionControl = 0xb6,
+    EntryModeSet = 0xb7,
+    PowerControl1 = 0xc0,
+    PowerControl2 = 0xc1,
+    PowerControl3 = 0xc2,
+    PowerControl4 = 0xc3,
+    PowerControl5 = 0xc4,
+    VCOMControl = 0xc5,
+    CABCControl9 = 0xc6,
+    CABCControl1 = 0xc8,
+    CABCControl2 = 0xc9,
+    CABCControl3 = 0xca,
+    CABCControl4 = 0xcb,
+    CABCControl5 = 0xcc,
+    CABCControl6 = 0xcd,
+    CABCControl7 = 0xce,
+    CABCControl8 = 0xcf,
+    NVMemoryWrite = 0xd0,
+    NVMemoryProtectionKey = 0xd1,
+    NVMemoryStatusRead = 0xd2,
+    ReadID4 = 0xd3,
+    PGAMCTRL = 0xe0,
+    NGAMCTRL = 0xe1,
+    DigitalGammaControl1 = 0xe2,
+    DigitalGammaControl2 = 0xe3,
+    SPIReadCommandSetting = 0xfb,
+}
+
+impl Into<u8> for Command {
+    fn into(self) -> u8 {
+        self as u8
+    }
+}
+
+pub trait Commands {
+    fn set_interface_pixel_format(
+        &mut self,
+        pixel_format: &PixelFormat,
+    ) -> Result<(), DisplayError>;
+    fn clear_screen(&mut self) -> Result<(), DisplayError>;
+    fn column_address_set(&mut self, start: u16, end: u16) -> Result<(), DisplayError>;
+    fn page_address_set(&mut self, start: u16, end: u16) -> Result<(), DisplayError>;
+}

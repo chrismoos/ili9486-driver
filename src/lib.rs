@@ -76,20 +76,9 @@ where
     _marker: PhantomData<T>,
 }
 
-pub enum Command {
-    ColumnAddressSet = 0x2a,
-    PageAddressSet = 0x2b,
-}
+mod commands;
+pub use commands::*;
 
-pub trait Commands {
-    fn set_interface_pixel_format(
-        &mut self,
-        pixel_format: &PixelFormat,
-    ) -> Result<(), DisplayError>;
-    fn clear_screen(&mut self) -> Result<(), DisplayError>;
-    fn column_address_set(&mut self, start: u16, end: u16) -> Result<(), DisplayError>;
-    fn page_address_set(&mut self, start: u16, end: u16) -> Result<(), DisplayError>;
-}
 impl<RW, T> Commands for ILI9486<RW, T>
 where
     RW: ReadWriteInterface<T> + PixelWriter<T>,
@@ -100,8 +89,8 @@ where
         pixel_format: &PixelFormat,
     ) -> Result<(), DisplayError> {
         match pixel_format {
-            PixelFormat::Rgb565 => self.write_command(0x3A.into(), &[0b01010101.into()]),
-            PixelFormat::Rgb666 => self.write_command(0x3A.into(), &[0b01100110.into()]),
+            PixelFormat::Rgb565 => self.write_command(0x3A, &[0b01010101.into()]),
+            PixelFormat::Rgb666 => self.write_command(0x3A, &[0b01100110.into()]),
             _ => Err(DisplayError::InvalidFormatError),
         }
     }
@@ -229,7 +218,10 @@ where
     ///
     /// `data_provider` - Function that provides data to be sent. `None` should be returned from the function when transmission is complete.
     ///
-    pub fn write_command(&mut self, command: u8, data: &[T]) -> Result<(), DisplayError> {
+    pub fn write_command<C>(&mut self, command: C, data: &[T]) -> Result<(), DisplayError>
+    where
+        C: Into<T>,
+    {
         self.rw_interface
             .write(WriteMode::Command, &mut [command.into()])?;
         self.rw_interface.write(WriteMode::Data, data)
@@ -243,7 +235,10 @@ where
     ///
     /// `output` - `output.len()` bytes will be read from the device.
     ///
-    pub fn read_command(&mut self, command: u8, output: &mut [T]) -> Result<(), DisplayError> {
+    pub fn read_command<C>(&mut self, command: C, output: &mut [T]) -> Result<(), DisplayError>
+    where
+        C: Into<T>,
+    {
         self.rw_interface
             .write(WriteMode::Command, &mut [command.into()])?;
         self.rw_interface.read(output)
