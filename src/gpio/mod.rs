@@ -19,8 +19,10 @@ macro_rules! write_bit {
     };
 }
 
-pub use self::gpio16::GPIO16ParallelInterface;
-pub use self::gpio8::GPIO8ParallelInterface;
+pub use self::gpio16::*;
+pub use self::gpio18::*;
+pub use self::gpio8::*;
 
 mod gpio16;
+mod gpio18;
 mod gpio8;

@@ -1,3 +1,4 @@
+use crate::gpio::U18;
 use display_interface::DisplayError;
 use display_interface::{ReadWriteInterface, WriteMode};
 
@@ -100,6 +101,35 @@ where
                     let (one, two, _three) = encode_rgb666_16bit(pixel_a, &(0, 0, 0));
                     self.write(WriteMode::Data, &[one, two])
                 }
+            },
+        }
+    }
+}
+
+fn encode_rgb666_18bit(pixel: &RGBPixel) -> u32 {
+    (((pixel.0 & 0b111111) as u32) << 12)
+        | (((pixel.1 & 0b111111) as u32) << 6)
+        | ((pixel.2 & 0b111111) as u32)
+}
+
+impl<T> PixelWriter<U18> for T
+where
+    T: ReadWriteInterface<U18>,
+{
+    fn write_pixel_data(
+        &mut self,
+        pixel_format: &PixelFormat,
+        pixel_a: &RGBPixel,
+        pixel_b: Option<&RGBPixel>,
+    ) -> Result<(), DisplayError> {
+        match pixel_format {
+            PixelFormat::Rgb565 => Err(DisplayError::DataFormatNotImplemented),
+            PixelFormat::Rgb666 => match pixel_b {
+                Some(b) => self.write(
+                    WriteMode::Data,
+                    &[encode_rgb666_18bit(pixel_a), encode_rgb666_18bit(b)],
+                ),
+                None => self.write(WriteMode::Data, &[encode_rgb666_18bit(pixel_a)]),
             },
         }
     }
