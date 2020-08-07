@@ -11,8 +11,8 @@ use crate::color::PixelFormat;
 use crate::color::PixelWriter;
 use core::convert::Infallible;
 use core::marker::PhantomData;
+use display_interface::v2::*;
 use display_interface::DisplayError;
-use display_interface::{ReadWriteInterface, WriteMode};
 
 use embedded_graphics::prelude::Pixel;
 use embedded_graphics::prelude::RgbColor;
@@ -213,7 +213,11 @@ where
         Ok(())
     }
 
-    pub fn rw_interface(&mut self) -> &mut dyn ReadWriteInterface<T> {
+    pub fn writer(&mut self) -> &mut RW {
+        &mut self.rw_interface
+    }
+
+    pub fn reader(&mut self) -> &mut RW {
         &mut self.rw_interface
     }
 

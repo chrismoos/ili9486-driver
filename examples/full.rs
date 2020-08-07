@@ -2,7 +2,7 @@
 #![no_std]
 #![no_main]
 
-use display_interface::WriteMode;
+use display_interface::v2::*;
 use embedded_graphics::image::Image;
 use ili9486::gpio::GPIO8ParallelInterface;
 use ili9486::io::stm32f1xx::PullDownInput;
@@ -143,13 +143,13 @@ fn main() -> ! {
 
     // Streaming interface
     lcd_driver
-        .rw_interface()
+        .writer()
         .write(WriteMode::Command, &mut [0x04])
         .unwrap();
     let mut num_read = 4;
 
     hprintln!("start the read");
-    for b in lcd_driver.rw_interface() {
+    for b in (lcd_driver.reader() as &mut dyn ReadInterface<_>) {
         if num_read == 0 {
             break;
         }
@@ -160,10 +160,10 @@ fn main() -> ! {
     // Fill interface
     let mut display_info: [u8; 4] = [0; 4];
     lcd_driver
-        .rw_interface()
+        .writer()
         .write(WriteMode::Command, &mut [0x04])
         .unwrap();
-    lcd_driver.rw_interface().read(&mut display_info).unwrap();
+    lcd_driver.writer().read(&mut display_info).unwrap();
     hprintln!("{:?}", display_info);
 
     // turn on

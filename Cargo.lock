@@ -95,7 +95,7 @@ dependencies = [
 [[package]]
 name = "display-interface"
 version = "0.4.0"
-source = "git+https://github.com/chrismoos/display-interface?branch=rw-interface#8d33b56a917e9d932647db1d0823d06e14d92a2f"
+source = "git+https://github.com/chrismoos/display-interface?branch=rw-interface#5831269da25eacbdde3b49a3ecc3972b54f33dcd"
 
 [[package]]
 name = "embedded-graphics"

@@ -1,7 +1,6 @@
 use crate::IoPin;
+use display_interface::v2::*;
 use display_interface::DisplayError;
-use display_interface::ReadWriteInterface;
-use display_interface::WriteMode;
 
 use embedded_hal::digital::v2::{InputPin, OutputPin};
 pub struct GPIO8ParallelInterface<DB0, DB1, DB2, DB3, DB4, DB5, DB6, DB7, CS, DCX, RDX, WRX>
@@ -93,7 +92,7 @@ where
     }
 }
 
-impl<DB0, DB1, DB2, DB3, DB4, DB5, DB6, DB7, CS, DCX, RDX, WRX> ReadWriteInterface<u8>
+impl<DB0, DB1, DB2, DB3, DB4, DB5, DB6, DB7, CS, DCX, RDX, WRX> ReadInterface<u8>
     for GPIO8ParallelInterface<DB0, DB1, DB2, DB3, DB4, DB5, DB6, DB7, CS, DCX, RDX, WRX>
 where
     DB0: IoPin,
@@ -169,7 +168,24 @@ where
 
         Ok(())
     }
+}
 
+impl<DB0, DB1, DB2, DB3, DB4, DB5, DB6, DB7, CS, DCX, RDX, WRX> WriteInterface<u8>
+    for GPIO8ParallelInterface<DB0, DB1, DB2, DB3, DB4, DB5, DB6, DB7, CS, DCX, RDX, WRX>
+where
+    DB0: IoPin,
+    DB1: IoPin,
+    DB2: IoPin,
+    DB3: IoPin,
+    DB4: IoPin,
+    DB5: IoPin,
+    DB6: IoPin,
+    DB7: IoPin,
+    CS: IoPin,
+    DCX: IoPin,
+    RDX: IoPin,
+    WRX: IoPin,
+{
     fn write_iter(
         &mut self,
         mode: WriteMode,

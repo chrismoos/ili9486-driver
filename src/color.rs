@@ -1,6 +1,6 @@
 use crate::gpio::U18;
+use display_interface::v2::*;
 use display_interface::DisplayError;
-use display_interface::{ReadWriteInterface, WriteMode};
 
 pub enum PixelFormat {
     Rgb565,
