@@ -1,10 +1,7 @@
 use crate::IoPin;
-use crate::PixelEncoder;
-use crate::PixelFormat;
 use display_interface::DisplayError;
 use display_interface::ReadWriteInterface;
 use display_interface::WriteMode;
-
 
 use embedded_hal::digital::v2::{InputPin, OutputPin};
 pub struct GPIO8ParallelInterface<DB0, DB1, DB2, DB3, DB4, DB5, DB6, DB7, CS, DCX, RDX, WRX>
@@ -93,48 +90,6 @@ where
             rdx: rdx,
             wrx: wrx,
         })
-    }
-}
-
-impl<DB0, DB1, DB2, DB3, DB4, DB5, DB6, DB7, CS, DCX, RDX, WRX> PixelEncoder<u8>
-    for GPIO8ParallelInterface<DB0, DB1, DB2, DB3, DB4, DB5, DB6, DB7, CS, DCX, RDX, WRX>
-where
-    DB0: IoPin,
-    DB1: IoPin,
-    DB2: IoPin,
-    DB3: IoPin,
-    DB4: IoPin,
-    DB5: IoPin,
-    DB6: IoPin,
-    DB7: IoPin,
-    CS: IoPin,
-    DCX: IoPin,
-    RDX: IoPin,
-    WRX: IoPin,
-{
-    fn encode_pixel_data(
-        &mut self,
-        pixel_format: PixelFormat,
-        red: u8,
-        green: u8,
-        blue: u8,
-        buf: &mut [u8; 4],
-    ) -> u8 {
-        match pixel_format {
-            PixelFormat::Rgb565 => {
-                let high: u8 = ((red & 0b11111) << 3) | ((green >> 2) & 0b111);
-                let low: u8 = ((green << 5) & 0b11100000) | (blue & 0b11111);
-                buf[0] = high;
-                buf[1] = low;
-                2
-            }
-            PixelFormat::Rgb666 => {
-                buf[0] = red << 2;
-                buf[1] = green << 2;
-                buf[2] = blue << 2;
-                3
-            }
-        }
     }
 }
 

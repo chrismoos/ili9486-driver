@@ -2,14 +2,11 @@
 #![no_std]
 #![no_main]
 
-
 use embedded_graphics::image::Image;
 use ili9486::gpio::GPIO8ParallelInterface;
 use ili9486::io::stm32f1xx::PullDownInput;
 use ili9486::io::stm32f1xx::PushPullOutput;
 use tinytga::Tga;
-
-
 
 use embedded_graphics::{
     fonts::{Font6x8, Text},
@@ -19,12 +16,11 @@ use embedded_graphics::{
     style::{PrimitiveStyle, TextStyle},
 };
 
-
-
+use ili9486::color::PixelFormat;
 use ili9486::io::stm32f1xx::gpioa::GPIOA;
 use ili9486::io::stm32f1xx::gpiob::GPIOB;
 use ili9486::io::stm32f1xx::gpioc::GPIOC;
-use ili9486::{Commands, PixelFormat, ILI9486};
+use ili9486::{Commands, ILI9486};
 
 extern crate panic_semihosting;
 

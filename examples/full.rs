@@ -13,7 +13,7 @@ use embedded_graphics::primitives::Rectangle;
 use embedded_graphics::style::PrimitiveStyleBuilder;
 use embedded_graphics::{
     fonts::{Font6x8, Text},
-    pixelcolor::{Rgb888},
+    pixelcolor::Rgb888,
     prelude::*,
     primitives::Circle,
     style::{PrimitiveStyle, TextStyle},
@@ -21,10 +21,11 @@ use embedded_graphics::{
 
 use cortex_m_semihosting::hprintln;
 
+use ili9486::color::PixelFormat;
 use ili9486::io::stm32f1xx::gpioa::GPIOA;
 use ili9486::io::stm32f1xx::gpiob::GPIOB;
 use ili9486::io::stm32f1xx::gpioc::GPIOC;
-use ili9486::{Commands, PixelFormat, ILI9486};
+use ili9486::{Commands, ILI9486};
 
 extern crate panic_semihosting;
 

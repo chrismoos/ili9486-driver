@@ -1,6 +1,4 @@
 use crate::IoPin;
-use crate::PixelEncoder;
-use crate::PixelFormat;
 use display_interface::DisplayError;
 use display_interface::ReadWriteInterface;
 use display_interface::WriteMode;
@@ -215,92 +213,6 @@ where
             rdx: rdx,
             wrx: wrx,
         })
-    }
-}
-
-impl<
-        DB0,
-        DB1,
-        DB2,
-        DB3,
-        DB4,
-        DB5,
-        DB6,
-        DB7,
-        DB8,
-        DB9,
-        DB10,
-        DB11,
-        DB12,
-        DB13,
-        DB14,
-        DB15,
-        CS,
-        DCX,
-        RDX,
-        WRX,
-    > PixelEncoder<u16>
-    for GPIO16ParallelInterface<
-        DB0,
-        DB1,
-        DB2,
-        DB3,
-        DB4,
-        DB5,
-        DB6,
-        DB7,
-        DB8,
-        DB9,
-        DB10,
-        DB11,
-        DB12,
-        DB13,
-        DB14,
-        DB15,
-        CS,
-        DCX,
-        RDX,
-        WRX,
-    >
-where
-    DB0: IoPin,
-    DB1: IoPin,
-    DB2: IoPin,
-    DB3: IoPin,
-    DB4: IoPin,
-    DB5: IoPin,
-    DB6: IoPin,
-    DB7: IoPin,
-    DB8: IoPin,
-    DB9: IoPin,
-    DB10: IoPin,
-    DB11: IoPin,
-    DB12: IoPin,
-    DB13: IoPin,
-    DB14: IoPin,
-    DB15: IoPin,
-    CS: IoPin,
-    DCX: IoPin,
-    RDX: IoPin,
-    WRX: IoPin,
-{
-    fn encode_pixel_data(
-        &mut self,
-        pixel_format: PixelFormat,
-        red: u8,
-        green: u8,
-        blue: u8,
-        buf: &mut [u16; 4],
-    ) -> u8 {
-        match pixel_format {
-            PixelFormat::Rgb565 => {
-                buf[0] = (((red & 0b11111) as u16) << 10)
-                    | (((green & 0b111111) as u16) << 4)
-                    | (blue & 0b11111) as u16;
-                1
-            }
-            PixelFormat::Rgb666 => panic!("not implemented"),
-        }
     }
 }
 

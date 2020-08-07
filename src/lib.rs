@@ -7,6 +7,8 @@
 //! with helpers in the [io](io) module.
 //!
 
+use crate::color::PixelFormat;
+use crate::color::PixelWriter;
 use core::convert::Infallible;
 use core::marker::PhantomData;
 use display_interface::DisplayError;
@@ -30,19 +32,10 @@ use embedded_hal::digital::v2::OutputPin;
 /// is resolved in `embedded-hal`.
 pub mod io;
 
-pub trait PixelEncoder<T> {
-    fn encode_pixel_data(
-        &mut self,
-        pixel_format: PixelFormat,
-        red: u8,
-        green: u8,
-        blue: u8,
-        buf: &mut [T; 4],
-    ) -> u8;
-}
-
 #[macro_use]
 pub mod gpio;
+
+pub mod color;
 
 use io::IoPin;
 
@@ -76,17 +69,11 @@ impl<'a, T> Iterator for PixelStream<'a, T> {
 /// A driver for the ILI9486 LCD controller.
 pub struct ILI9486<RW, T>
 where
-    RW: ReadWriteInterface<T>,
+    RW: ReadWriteInterface<T> + PixelWriter<T>,
 {
     rw_interface: RW,
     color_mode: PixelFormat,
     _marker: PhantomData<T>,
-}
-
-#[derive(Debug, Copy, Clone)]
-pub enum PixelFormat {
-    Rgb565,
-    Rgb666,
 }
 
 pub enum Command {
@@ -95,20 +82,22 @@ pub enum Command {
 }
 
 pub trait Commands {
-    fn set_interface_pixel_format(&mut self, pixel_format: PixelFormat)
-        -> Result<(), DisplayError>;
+    fn set_interface_pixel_format(
+        &mut self,
+        pixel_format: &PixelFormat,
+    ) -> Result<(), DisplayError>;
     fn clear_screen(&mut self) -> Result<(), DisplayError>;
     fn column_address_set(&mut self, start: u16, end: u16) -> Result<(), DisplayError>;
     fn page_address_set(&mut self, start: u16, end: u16) -> Result<(), DisplayError>;
 }
 impl<RW, T> Commands for ILI9486<RW, T>
 where
-    RW: ReadWriteInterface<T> + PixelEncoder<T>,
+    RW: ReadWriteInterface<T> + PixelWriter<T>,
     T: From<u8> + Default,
 {
     fn set_interface_pixel_format(
         &mut self,
-        pixel_format: PixelFormat,
+        pixel_format: &PixelFormat,
     ) -> Result<(), DisplayError> {
         match pixel_format {
             PixelFormat::Rgb565 => self.write_command(0x3A.into(), &[0b01010101.into()]),
@@ -148,7 +137,7 @@ where
 
 impl<RW, T> ILI9486<RW, T>
 where
-    RW: ReadWriteInterface<T> + PixelEncoder<T>,
+    RW: ReadWriteInterface<T> + PixelWriter<T>,
     T: From<u8> + Default,
 {
     pub fn new<RST>(
@@ -168,11 +157,12 @@ where
 
         let mut driver = ILI9486 {
             rw_interface: rw_interface,
-            color_mode: color_mode,
+            color_mode: PixelFormat::Rgb565,
             _marker: PhantomData,
         };
 
-        driver.set_interface_pixel_format(driver.color_mode)?;
+        driver.set_interface_pixel_format(&color_mode)?;
+        driver.color_mode = color_mode;
 
         Ok(driver)
     }
@@ -183,12 +173,8 @@ where
 
         self.rw_interface
             .write(WriteMode::Command, &[0x2c.into()])?;
-
-        let mut buf: [T; 4] = Default::default();
-        let bytes_per_pixel =
-            self.rw_interface
-                .encode_pixel_data(self.color_mode, r, g, b, &mut buf);
-        self.write_command(0x2c, &mut buf[0..bytes_per_pixel as usize])
+        self.rw_interface
+            .write_pixel_data(&self.color_mode, &(r, g, b), None)
     }
 
     fn _draw_rect(
@@ -208,20 +194,23 @@ where
         self.rw_interface
             .write(WriteMode::Command, &[0x2c.into()])?;
 
-        let mut buf: [T; 4] = Default::default();
-        let bytes_per_pixel =
-            self.rw_interface
-                .encode_pixel_data(self.color_mode, r, g, b, &mut buf);
+        self.rw_interface
+            .write(WriteMode::Command, &[0x2c.into()])?;
 
-        self.rw_interface.write_iter(
-            WriteMode::Data,
-            &mut PixelStream {
-                bytes_per_pixel: bytes_per_pixel,
-                total: n,
-                index: 0,
-                pixel_data: &buf,
-            },
-        )
+        for x in (0..n).step_by(2) {
+            // last pixel
+            if x + 1 == n {
+                self.rw_interface
+                    .write_pixel_data(&self.color_mode, &(r, g, b), None)?;
+            } else {
+                self.rw_interface.write_pixel_data(
+                    &self.color_mode,
+                    &(r, g, b),
+                    Some(&(r, g, b)),
+                )?;
+            }
+        }
+        Ok(())
     }
 
     pub fn rw_interface(&mut self) -> &mut dyn ReadWriteInterface<T> {
@@ -260,7 +249,7 @@ where
 impl<RW, RGBC> DrawTarget<RGBC> for ILI9486<RW, u8>
 where
     RGBC: RgbColor,
-    RW: ReadWriteInterface<u8> + PixelEncoder<u8>,
+    RW: ReadWriteInterface<u8> + PixelWriter<u8>,
 {
     type Error = Infallible;
 
