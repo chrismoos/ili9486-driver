@@ -41,31 +41,6 @@ use io::IoPin;
 
 use embedded_hal::blocking::delay::DelayUs;
 
-struct PixelStream<'a, T> {
-    total: usize,
-    index: usize,
-    bytes_per_pixel: u8,
-    pixel_data: &'a [T],
-}
-
-impl<'a, T> Iterator for PixelStream<'a, T> {
-    type Item = &'a T;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.total == 0 {
-            None
-        } else {
-            let result: &T = &self.pixel_data[self.index];
-            self.index += 1;
-            if self.index == self.bytes_per_pixel as usize {
-                self.index = 0;
-                self.total -= 1;
-            }
-            Some(result)
-        }
-    }
-}
-
 /// A driver for the ILI9486 LCD controller.
 pub struct ILI9486<RW, T>
 where
