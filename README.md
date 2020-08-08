@@ -11,12 +11,23 @@ See the [full example](examples/full.rs) for usage, or check out the documentati
 ## Tasks
 
 - [x] GPIO 8-bit Parallel Interface
-- [ ] GPIO 16-bit Parallel Interface (Needs testing, needs Rgb666 support)
+- [ ] GPIO 16-bit Parallel Interface (Needs testing)
+- [ ] GPIO 18-bit Parallel Interface (Needs testing)
 - [ ] Serial Interface (3 and 4-wire)
+
+## I/O Pin
+
+To facilitate both read and writes on the same pin, there is a [local implementation](./src/io/mod.rs) of the `IoPin` concept in this crate, which will be eliminated later once [this issue](https://github.com/rust-embedded/embedded-hal/issues/29) on `embedded-hal` is resolved.
+
+For now, there is a shim, `OutputOnlyIoPin` that you can use to create an `IoPin` from a single `OutputPin`:
+
+```rust
+let pa5 = OutputOnlyIoPin::new(gpioa.pa5.into_push_pull_output(&mut gpioa.crl));
+```
 
 ## Example
 
-Setup the LCD with the 8-bit parallel interface, and draw some text and an image. See this whole example [here](./examples/hello_world.rs).
+Setup the LCD with the 8-bit parallel interface, and draw some text and an image. See this whole example [here](./examples/output_only.rs).
 
 ```rust
 let parallel_gpio =

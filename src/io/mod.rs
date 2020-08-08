@@ -33,3 +33,5 @@ pub trait IoPin {
 
 #[cfg(feature = "stm32f1xx")]
 pub mod stm32f1xx;
+
+pub mod shim;
