@@ -8,6 +8,17 @@ See the [full example](examples/full.rs) for usage, or check out the documentati
 
 <img src="./examples/hello_world.jpg" width="200" />
 
+
+## Usage
+
+This crate is not yet published, but you can stil try it out.
+
+Add the following to your `Cargo.toml`:
+
+```toml
+ili9486-driver = {git = "https://github.com/chrismoos/ili9486-driver", branch = "master"}
+```
+
 ## Tasks
 
 - [x] GPIO 8-bit Parallel Interface
