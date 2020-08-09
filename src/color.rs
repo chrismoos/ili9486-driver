@@ -38,27 +38,6 @@ fn encode_rgb565_8bit(pixel: &RGBPixel) -> (u8, u8) {
     )
 }
 
-struct PixelStream<'a, T> {
-    pixel_data: &'a [&'a T],
-    total: usize,
-}
-impl<'a, T> Iterator for PixelStream<'a, T> {
-    type Item = &'a T;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.total == 0 {
-            None
-        } else {
-            self.total -= 1;
-            if self.total % 2 == 0 {
-                Some(self.pixel_data[1])
-            } else {
-                Some(self.pixel_data[0])
-            }
-        }
-    }
-}
-
 impl<T> PixelWriter<u8> for T
 where
     T: ReadWriteInterface<u8>,
