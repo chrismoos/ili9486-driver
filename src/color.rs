@@ -147,6 +147,34 @@ where
             },
         }
     }
+
+    fn write_repeated_pixel_data(
+        &mut self,
+        pixel_format: &PixelFormat,
+        pixel: &RGBPixel,
+        num: usize,
+    ) -> Result<(), DisplayError> {
+        match pixel_format {
+            PixelFormat::Rgb565 => {
+                let data = encode_rgb565_16bit(pixel);
+                let mut index = num;
+                self.write_stream(WriteMode::Data, &mut || {
+                    if index == 0 {
+                        None
+                    } else {
+                        index -= 1;
+                        Some(&data)
+                    }
+                })
+            }
+            PixelFormat::Rgb666 => {
+                for _ in 0..num {
+                    self.write_pixel_data(pixel_format, pixel, None)?;
+                }
+                Ok(())
+            }
+        }
+    }
 }
 
 fn encode_rgb666_18bit(pixel: &RGBPixel) -> u32 {
