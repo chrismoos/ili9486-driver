@@ -481,10 +481,11 @@ where
     RDX: IoPin,
     WRX: IoPin,
 {
-    fn write_iter(
+    #[inline(always)]
+    fn write_stream<'a>(
         &mut self,
         mode: WriteMode,
-        iter: &mut dyn Iterator<Item = &U18>,
+        func: &mut dyn FnMut() -> Option<&'a U18>,
     ) -> Result<(), DisplayError> {
         let b0 = self.db0.into_output();
         let b1 = self.db1.into_output();
@@ -522,27 +523,34 @@ where
             }
         }
 
-        for byte in iter {
-            wrap_output_err!(wrx.set_low())?;
-            write_bit!(b0, (1 << 0) & *byte != 0);
-            write_bit!(b1, (1 << 1) & *byte != 0);
-            write_bit!(b2, (1 << 2) & *byte != 0);
-            write_bit!(b3, (1 << 3) & *byte != 0);
-            write_bit!(b4, (1 << 4) & *byte != 0);
-            write_bit!(b5, (1 << 5) & *byte != 0);
-            write_bit!(b6, (1 << 6) & *byte != 0);
-            write_bit!(b7, (1 << 7) & *byte != 0);
-            write_bit!(b8, (1 << 8) & *byte != 0);
-            write_bit!(b9, (1 << 9) & *byte != 0);
-            write_bit!(b10, (1 << 10) & *byte != 0);
-            write_bit!(b11, (1 << 11) & *byte != 0);
-            write_bit!(b12, (1 << 12) & *byte != 0);
-            write_bit!(b13, (1 << 13) & *byte != 0);
-            write_bit!(b14, (1 << 14) & *byte != 0);
-            write_bit!(b15, (1 << 15) & *byte != 0);
-            write_bit!(b16, (1 << 16) & *byte != 0);
-            write_bit!(b17, (1 << 17) & *byte != 0);
-            wrap_output_err!(wrx.set_high())?;
+        loop {
+            match func() {
+                Some(byte) => {
+                    wrx.set_low();
+                    write_bit!(b0, (1 << 0) & *byte != 0);
+                    write_bit!(b1, (1 << 1) & *byte != 0);
+                    write_bit!(b2, (1 << 2) & *byte != 0);
+                    write_bit!(b3, (1 << 3) & *byte != 0);
+                    write_bit!(b4, (1 << 4) & *byte != 0);
+                    write_bit!(b5, (1 << 5) & *byte != 0);
+                    write_bit!(b6, (1 << 6) & *byte != 0);
+                    write_bit!(b7, (1 << 7) & *byte != 0);
+                    write_bit!(b8, (1 << 8) & *byte != 0);
+                    write_bit!(b9, (1 << 9) & *byte != 0);
+                    write_bit!(b10, (1 << 10) & *byte != 0);
+                    write_bit!(b11, (1 << 11) & *byte != 0);
+                    write_bit!(b12, (1 << 12) & *byte != 0);
+                    write_bit!(b13, (1 << 13) & *byte != 0);
+                    write_bit!(b14, (1 << 14) & *byte != 0);
+                    write_bit!(b15, (1 << 15) & *byte != 0);
+                    write_bit!(b16, (1 << 16) & *byte != 0);
+                    write_bit!(b17, (1 << 17) & *byte != 0);
+                    wrx.set_high();
+                }
+                None => {
+                    break;
+                }
+            }
         }
 
         match mode {

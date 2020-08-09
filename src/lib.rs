@@ -131,7 +131,7 @@ where
         Ok(driver)
     }
 
-    fn _draw_pixel(&mut self, x: u16, y: u16, r: u8, g: u8, b: u8) -> Result<(), DisplayError> {
+    pub fn _draw_pixel(&mut self, x: u16, y: u16, r: u8, g: u8, b: u8) -> Result<(), DisplayError> {
         self.column_address_set(x, x + 1)?;
         self.page_address_set(y, y + 1)?;
 
@@ -159,22 +159,7 @@ where
             .write(WriteMode::Command, &[0x2c.into()])?;
 
         self.rw_interface
-            .write(WriteMode::Command, &[0x2c.into()])?;
-
-        for x in (0..n).step_by(2) {
-            // last pixel
-            if x + 1 == n {
-                self.rw_interface
-                    .write_pixel_data(&self.color_mode, &(r, g, b), None)?;
-            } else {
-                self.rw_interface.write_pixel_data(
-                    &self.color_mode,
-                    &(r, g, b),
-                    Some(&(r, g, b)),
-                )?;
-            }
-        }
-        Ok(())
+            .write_repeated_pixel_data(&self.color_mode, &(r, g, b), n)
     }
 
     pub fn writer(&mut self) -> &mut RW {

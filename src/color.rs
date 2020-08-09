@@ -17,6 +17,18 @@ pub trait PixelWriter<T> {
         pixel_a: &RGBPixel,
         pixel_b: Option<&RGBPixel>,
     ) -> Result<(), DisplayError>;
+
+    fn write_repeated_pixel_data(
+        &mut self,
+        pixel_format: &PixelFormat,
+        pixel: &RGBPixel,
+        num: usize,
+    ) -> Result<(), DisplayError> {
+        for _ in 0..num {
+            self.write_pixel_data(pixel_format, pixel, None)?;
+        }
+        Ok(())
+    }
 }
 
 fn encode_rgb565_8bit(pixel: &RGBPixel) -> (u8, u8) {
@@ -26,10 +38,62 @@ fn encode_rgb565_8bit(pixel: &RGBPixel) -> (u8, u8) {
     )
 }
 
+struct PixelStream<'a, T> {
+    pixel_data: &'a [&'a T],
+    total: usize,
+}
+impl<'a, T> Iterator for PixelStream<'a, T> {
+    type Item = &'a T;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.total == 0 {
+            None
+        } else {
+            self.total -= 1;
+            if self.total % 2 == 0 {
+                Some(self.pixel_data[1])
+            } else {
+                Some(self.pixel_data[0])
+            }
+        }
+    }
+}
+
 impl<T> PixelWriter<u8> for T
 where
     T: ReadWriteInterface<u8>,
 {
+    fn write_repeated_pixel_data(
+        &mut self,
+        pixel_format: &PixelFormat,
+        pixel: &RGBPixel,
+        num: usize,
+    ) -> Result<(), DisplayError> {
+        match pixel_format {
+            PixelFormat::Rgb565 => {
+                let (hi, lo) = encode_rgb565_8bit(pixel);
+                let mut index = num * 2;
+                self.write_stream(WriteMode::Data, &mut || {
+                    if index == 0 {
+                        None
+                    } else {
+                        index -= 1;
+                        if index % 2 == 0 {
+                            Some(&lo)
+                        } else {
+                            Some(&hi)
+                        }
+                    }
+                })
+            }
+            PixelFormat::Rgb666 => {
+                for _ in 0..num {
+                    self.write_pixel_data(pixel_format, pixel, None)?;
+                }
+                Ok(())
+            }
+        }
+    }
     fn write_pixel_data(
         &mut self,
         pixel_format: &PixelFormat,

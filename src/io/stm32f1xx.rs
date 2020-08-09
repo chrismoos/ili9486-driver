@@ -89,11 +89,11 @@ macro_rules! stm32f1xx_io_pins {
                 where I: InputPinType, O: OutputPinType {
                     type Error = PinModeError;
 
-                    #[inline]
+                    #[inline(always)]
                     fn set_low(&mut self) -> Result<(), Self::Error> {
                         self.pin.set_low()
                     }
-                    #[inline]
+                    #[inline(always)]
                     fn set_high(&mut self) -> Result<(), Self::Error> {
                         self.pin.set_high()
                     }

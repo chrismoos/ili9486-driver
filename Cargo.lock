@@ -95,7 +95,7 @@ dependencies = [
 [[package]]
 name = "display-interface"
 version = "0.4.0"
-source = "git+https://github.com/chrismoos/display-interface?branch=rw-interface#5831269da25eacbdde3b49a3ecc3972b54f33dcd"
+source = "git+https://github.com/chrismoos/display-interface?branch=rw-interface#99205d188b7b833b334b70bc3af455810d0b8901"
 
 [[package]]
 name = "embedded-graphics"
@@ -146,6 +146,7 @@ dependencies = [
  "embedded-hal",
  "nb 0.1.3",
  "no-std-compat",
+ "numtoa",
  "panic-semihosting",
  "stm32f1 0.10.0",
  "stm32f1xx-hal",
@@ -188,6 +189,12 @@ dependencies = [
  "memchr",
  "version_check",
 ]
+
+[[package]]
+name = "numtoa"
+version = "0.2.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e521b6adefa0b2c1fa5d2abdf9a5216288686fe6146249215d884c0e5ab320b0"
 
 [[package]]
 name = "panic-semihosting"

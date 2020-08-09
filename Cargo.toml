@@ -13,6 +13,9 @@ stm32f1xx = []
 name = "ili9486"
 path = "src/lib.rs"
 
+[dev-dependencies]
+numtoa = "0.2"
+
 [dev-dependencies.tinytga]
 version = "0.3"
 features = ["graphics"]
