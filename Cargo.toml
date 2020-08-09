@@ -1,8 +1,13 @@
 [package]
 name = "ili9486-driver"
+description = "ILI9486 driver for embedded devices"
 version = "0.1.0"
 authors = ["Chris Moos <chris@chrismoos.com>"]
 edition = "2018"
+repository = "https://github.com/chrismoos/ili9486-driver"
+homepage = "https://github.com/chrismoos/ili9486-driver"
+license = "Apache-2.0"
+readme = "README.md"
 
 [features]
 default = []
