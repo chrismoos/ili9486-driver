@@ -25,6 +25,35 @@ For now, there is a shim, `OutputOnlyIoPin` that you can use to create an `IoPin
 let pa5 = OutputOnlyIoPin::new(gpioa.pa5.into_push_pull_output(&mut gpioa.crl));
 ```
 
+## Devices
+
+Tested on the following devices:
+
+* STM32F1xx
+
+## Benchmark
+
+The **Fill Screen** benchmark draws a rectangle covering the whole screen with a solid color:
+
+```rust
+let mut start = elapsed_millis();
+Rectangle::new(Point::new(0, 0), Point::new(320, 480))
+    .into_styled(
+        PrimitiveStyleBuilder::new()
+            .fill_color(Rgb888::CYAN)
+            .build(),
+    )
+    .draw(&mut lcd_driver)
+    .unwrap();
+let screen_fill_rect = elapsed_millis() - start;
+```
+
+### Results
+
+|Device|Interface|Color Mode|Fill Screen (ms)|Pixel Rate/s|
+|------|---------|--------|---------|------|
+|STM32F103RB (72Mhz)|GPIO 8-Bit|RGB 5-6-5|250ms|1,228,800|
+
 ## Example
 
 Setup the LCD with the 8-bit parallel interface, and draw some text and an image. See this whole example [here](./examples/output_only.rs).
