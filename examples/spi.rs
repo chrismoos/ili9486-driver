@@ -71,7 +71,7 @@ fn main() -> ! {
         polarity: Polarity::IdleLow,
         phase: Phase::CaptureOnFirstTransition,
     };
-    let spi = Spi::spi2(dp.SPI2, pins, spi_mode, 100.khz(), clocks, &mut rcc.apb1);
+    let spi = Spi::spi2(dp.SPI2, pins, spi_mode, 8.mhz(), clocks, &mut rcc.apb1);
 
     let display_spi = SPIInterface::new(spi, dc, cs);
 
