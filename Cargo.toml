@@ -39,6 +39,10 @@ cortex-m-rt = { version = "0.6.11", optional = true }
 git = "https://github.com/chrismoos/display-interface"
 branch = "rw-interface"
 
+[dev-dependencies.display-interface-spi]
+git = "https://github.com/chrismoos/display-interface"
+branch = "rw-interface"
+
 [dependencies.embedded-hal]
 version = "0.2.3"
 features = ["unproven"]

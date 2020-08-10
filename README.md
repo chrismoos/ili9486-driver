@@ -24,7 +24,8 @@ ili9486-driver = {git = "https://github.com/chrismoos/ili9486-driver", branch = 
 - [x] GPIO 8-bit Parallel Interface
 - [ ] GPIO 16-bit Parallel Interface (Needs testing)
 - [ ] GPIO 18-bit Parallel Interface (Needs testing)
-- [ ] Serial Interface (3 and 4-wire)
+- [ ] Serial Interface (3-wire)
+- [ ] Serial Interface (4-wire), (Needs testing)
 
 ## I/O Pin
 
@@ -107,6 +108,48 @@ let image: Image<Tga, Rgb888> = Image::new(
 );
 
 image.draw(&mut lcd_driver).unwrap();
+```
+
+## SPI
+
+An experimental 4-wire SPI interface is available, add the following to your `Cargo.toml`:
+
+```toml
+[dependencies.display-interface-spi]
+git = "https://github.com/chrismoos/display-interface"
+branch = "rw-interface"
+```
+
+See below or check out the [full SPI example](./examples/spi.rs):
+
+```rust
+let mut gpiob = dp.GPIOB.split(&mut rcc.apb2);
+
+let pins = (
+    gpiob.pb13.into_alternate_push_pull(&mut gpiob.crh),
+    gpiob.pb14.into_floating_input(&mut gpiob.crh),
+    gpiob.pb15.into_alternate_push_pull(&mut gpiob.crh),
+);
+
+let cs = gpiob.pb10.into_push_pull_output(&mut gpiob.crh);
+let dc = gpiob.pb9.into_push_pull_output(&mut gpiob.crh);
+let rst = gpiob.pb8.into_push_pull_output(&mut gpiob.crh);
+
+let spi_mode = Mode {
+    polarity: Polarity::IdleLow,
+    phase: Phase::CaptureOnFirstTransition,
+};
+let spi = Spi::spi2(dp.SPI2, pins, spi_mode, 100.khz(), clocks, &mut rcc.apb1);
+
+let display_spi = SPIInterface::new(spi, dc, cs);
+
+let mut lcd_driver = ILI9486::new(
+    &mut delay,
+    PixelFormat::Rgb565,
+    display_spi,
+    OutputOnlyIoPin::new(rst),
+)
+.unwrap();
 ```
 
 ## License
