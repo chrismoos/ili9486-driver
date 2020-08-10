@@ -117,7 +117,7 @@ where
         wrap_output_err!(rst_output.set_low())?;
         delay.delay_us(20);
         wrap_output_err!(rst_output.set_high())?;
-        delay.delay_us(120_000_000);
+        delay.delay_us(120_000);
 
         let mut driver = ILI9486 {
             rw_interface: rw_interface,
