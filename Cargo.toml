@@ -11,8 +11,26 @@ readme = "README.md"
 
 [features]
 default = []
-examples = ["panic-semihosting", "stm32f1", "cortex-m-semihosting", "cortex-m", "cortex-m-rt", "stm32f1xx-hal"]
+examples = ["panic-semihosting", "stm32f1",  "cortex-m-semihosting", "cortex-m", "cortex-m-rt", "stm32f4" ]
 stm32f1xx = []
+stm32f4xx = []
+stm32f401 = ["stm32f4xx-hal/stm32f401"]
+stm32f405 = ["stm32f4xx-hal/stm32f405"]
+stm32f407 = ["stm32f4xx-hal/stm32f407"]
+stm32f410 = ["stm32f4xx-hal/stm32f410"]
+stm32f411 = ["stm32f4xx-hal/stm32f411"]
+stm32f412 = ["stm32f4xx-hal/stm32f412"]
+stm32f413 = ["stm32f4xx-hal/stm32f413"]
+stm32f415 = ["stm32f4xx-hal/stm32f405"]
+stm32f417 = ["stm32f4xx-hal/stm32f407"]
+stm32f423 = ["stm32f4xx-hal/stm32f413"]
+stm32f427 = ["stm32f4xx-hal/stm32f427"]
+stm32f429 = ["stm32f4xx-hal/stm32f429"]
+stm32f437 = ["stm32f4xx-hal/stm32f427"]
+stm32f439 = ["stm32f4xx-hal/stm32f429"]
+stm32f446 = ["stm32f4xx-hal/stm32f446"]
+stm32f469 = ["stm32f4xx-hal/stm32f469"]
+stm32f479 = ["stm32f4xx-hal/stm32f469"]
 
 [lib]
 name = "ili9486"
@@ -31,9 +49,10 @@ nb = "0.1.2"
 no-std-compat = "0.4"
 panic-semihosting = { version = "0.5.3", optional = true }
 stm32f1 = { version = "0.10.0", optional = true }
+stm32f4 = { version = "0.13.0", optional = true }
 cortex-m-semihosting = { version = "0.3.5", optional = true }
-cortex-m = { version = "0.6.2", optional = true }
-cortex-m-rt = { version = "0.6.11", optional = true }
+cortex-m = { version = "0.6.5", optional = true }
+cortex-m-rt = { version = "0.6.5", optional = true }
 
 [dependencies.display-interface]
 git = "https://github.com/chrismoos/display-interface"
@@ -54,6 +73,11 @@ lto = true
 [dependencies.stm32f1xx-hal]
 git = "https://github.com/stm32-rs/stm32f1xx-hal"
 features = ["rt", "stm32f103", "medium"]
+optional = true
+
+[dependencies.stm32f4xx-hal]
+git = "https://github.com/stm32-rs/stm32f4xx-hal"
+features = ["rt"]
 optional = true
 
 [profile.dev]

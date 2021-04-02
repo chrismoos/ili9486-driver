@@ -152,6 +152,20 @@ let mut lcd_driver = ILI9486::new(
 .unwrap();
 ```
 
+## Building examples
+
+### stm32f1xx
+
+```bash
+$  cargo build --example hello_world --features=examples,stm32f1xx,stm32f1xx-hal
+```
+
+### stm32f4xx
+
+```bash
+$ cargo build --example stm32f4xx_hello_world --features=examples,stm32f4xx,stm32f4xx-hal,stm32f407 --target=thumbv7em-none-eabihf
+```
+
 ## License
 
 This project uses the Apache License, Version 2.0 (LICENSE-APACHE or http://www.apache.org/licenses/LICENSE-2.0).
