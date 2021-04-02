@@ -2,7 +2,7 @@
 /*
  * Example for stm32f4xx
  *
- * $ cargo build --example stm32f4xx_hello_world --features=examples,stm32f4xx,stm32f4xx-hal,stm32f407 --target=thumbv7em-none-eabihf
+ * $ cargo build --example stm32f4xx_hello_world --features=examples,stm32f4xx,stm32f4xx-hal,stm32f446 --target=thumbv7em-none-eabihf
  */
 #![deny(unsafe_code)]
 #![no_std]
@@ -61,27 +61,27 @@ fn main() -> ! {
 
     let mut delay = Delay::new(cp.SYST, clocks);
 
-    let pa5 = GPIOA::PA5::<PullDown, PushPull>(gpioa.pa5.into_pull_down_input());
-    let pa6 = GPIOA::PA6::<PullDown, PushPull>(gpioa.pa6.into_pull_down_input());
-    let pa7 = GPIOA::PA7::<PullDown, PushPull>(gpioa.pa7.into_pull_down_input());
-
-    let pa8 = GPIOA::PA8::<PullDown, PushPull>(gpioa.pa8.into_pull_down_input());
     let pa9 = GPIOA::PA9::<PullDown, PushPull>(gpioa.pa9.into_pull_down_input());
+    let pc7 = GPIOC::PC7::<PullDown, PushPull>(gpioc.pc7.into_pull_down_input());
     let pa10 = GPIOA::PA10::<PullDown, PushPull>(gpioa.pa10.into_pull_down_input());
 
-    let pb10 = GPIOB::PB10::<PullDown, PushPull>(gpiob.pb10.into_pull_down_input());
+    let pb3 = GPIOB::PB3::<PullDown, PushPull>(gpiob.pb3.into_pull_down_input());
     let pb5 = GPIOB::PB5::<PullDown, PushPull>(gpiob.pb5.into_pull_down_input());
-    let pb6 = GPIOB::PB6::<PullDown, PushPull>(gpiob.pb6.into_pull_down_input());
-    let pb7 = GPIOB::PB7::<PullDown, PushPull>(gpiob.pb7.into_pull_down_input());
-    let pb8 = GPIOB::PB8::<PullDown, PushPull>(gpiob.pb8.into_pull_down_input());
-    let pb9 = GPIOB::PB9::<PullDown, PushPull>(gpiob.pb9.into_pull_down_input());
+    let pb4 = GPIOB::PB4::<PullDown, PushPull>(gpiob.pb4.into_pull_down_input());
 
-    let pc7 = GPIOC::PC7::<PullDown, PushPull>(gpioc.pc7.into_pull_down_input());
+    let pb10 = GPIOB::PB10::<PullDown, PushPull>(gpiob.pb10.into_pull_down_input());
+    let pc1 = GPIOC::PC1::<PullDown, PushPull>(gpioc.pc1.into_pull_down_input());
+    let pb0 = GPIOB::PB0::<PullDown, PushPull>(gpiob.pb0.into_pull_down_input());
+    let pa0 = GPIOA::PA0::<PullDown, PushPull>(gpioa.pa0.into_pull_down_input());
+    let pa4 = GPIOA::PA4::<PullDown, PushPull>(gpioa.pa4.into_pull_down_input());
+    let pa1 = GPIOA::PA1::<PullDown, PushPull>(gpioa.pa1.into_pull_down_input());
+
+    let pa8 = GPIOA::PA8::<PullDown, PushPull>(gpioa.pa8.into_pull_down_input());
 
     let parallel_gpio =
-        GPIO8ParallelInterface::new(pa5, pa6, pa7, pa8, pa9, pa10, pc7, pb10, pb6, pb8, pb7, pb9)
+        GPIO8ParallelInterface::new(pa9, pc7, pa10, pb3, pb5, pb4, pb10, pa8, pb0, pa4, pa0, pa1)
             .unwrap();
-    let mut lcd_driver = ILI9486::new(&mut delay, PixelFormat::Rgb565, parallel_gpio, pb5).unwrap();
+    let mut lcd_driver = ILI9486::new(&mut delay, PixelFormat::Rgb565, parallel_gpio, pc1).unwrap();
 
     // reset
     lcd_driver.write_command(Command::Nop, &[]).unwrap();
