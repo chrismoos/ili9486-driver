@@ -205,10 +205,11 @@ where
     }
 }
 
-impl<RW, RGBC> DrawTarget<RGBC> for ILI9486<RW, u8>
+impl<RW, RGBC, T> DrawTarget<RGBC> for ILI9486<RW, T>
 where
     RGBC: RgbColor,
-    RW: ReadWriteInterface<u8> + PixelWriter<u8>,
+    RW: ReadWriteInterface<T> + PixelWriter<T>,
+    T: From<u8> + Default,
 {
     type Error = Infallible;
 
